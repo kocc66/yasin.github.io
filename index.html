@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Oyunlar</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        .game { margin: 20px; padding: 20px; border: 1px solid #ccc; display: inline-block; }
+        #puzzle { display: none; }
+    </style>
+</head>
+<body>
+    <h1>Mini Oyunlar</h1>
+
+    <div class="game">
+        <h2>Tahmin Et Oyunu</h2>
+        <p>1 ile 100 arasında bir sayı tahmin edin!</p>
+        <input type="number" id="guess" min="1" max="100">
+        <button onclick="guessNumber()">Tahmin Et</button>
+        <p id="guessResult"></p>
+    </div>
+
+    <div class="game">
+        <h2>Yakalboz Oyunu</h2>
+        <button onclick="startPuzzle()">Başla</button>
+        <div id="puzzle"></div>
+    </div>
+
+    <script>
+        // Tahmin Et Oyunu
+        let randomNumber = Math.floor(Math.random() * 100) + 1;
+
+        function guessNumber() {
+            const userGuess = parseInt(document.getElementById('guess').value);
+            const result = document.getElementById('guessResult');
+
+            if (userGuess < 1 || userGuess > 100 || isNaN(userGuess)) {
+                result.textContent = "Lütfen 1 ile 100 arasında bir sayı girin.";
+            } else if (userGuess < randomNumber) {
+                result.textContent = "Daha yüksek!";
+            } else if (userGuess > randomNumber) {
+                result.textContent = "Daha düşük!";
+            } else {
+                result.textContent = "Tebrikler! Doğru tahmin ettiniz.";
+                randomNumber = Math.floor(Math.random() * 100) + 1; // Yeni bir sayı üret
+            }
+        }
+
+        // Yakalboz Oyunu
+        function startPuzzle() {
+            const puzzleContainer = document.getElementById('puzzle');
+            puzzleContainer.innerHTML = '';
+            const numbers = [...Array(9).keys()].map(n => n + 1).sort(() => Math.random() - 0.5);
+            numbers.push(''); // boş alan için
+
+            for (let i = 0; i < 3; i++) {
+                const row = document.createElement('div');
+                for (let j = 0; j < 3; j++) {
+                    const index = i * 3 + j;
+                    const cell = document.createElement('div');
+                    cell.textContent = numbers[index];
+                    cell.classList.add('cell');
+                    cell.style.width = '60px';
+                    cell.style.height = '60px';
+                    cell.style.border = '1px solid #000';
+                    cell.style.display = 'inline-block';
+                    cell.style.lineHeight = '60px';
+                    cell.style.fontSize = '24px';
+                    cell.style.cursor = 'pointer';
+                    cell.onclick = () => moveCell(index, numbers);
+                    row.appendChild(cell);
+                }
+                puzzleContainer.appendChild(row);
+            }
+        }
+
+        function moveCell(index, numbers) {
+            const emptyIndex = numbers.indexOf('');
+            if ([index - 1, index + 1, index - 3, index + 3].includes(emptyIndex)) {
+                [numbers[index], numbers[emptyIndex]] = [numbers[emptyIndex], numbers[index]];
+                startPuzzle(); // Yeniden başlat
+            }
+        }
+    </script>
+</body>
+</html>
